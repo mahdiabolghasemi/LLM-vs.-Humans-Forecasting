@@ -6,3 +6,7 @@ This is the repository for replicating the results of "Humans vs. large language
 The main analysis of mixed-effect models is done using STATA. The input data (experiment_dataset.dta) and code (data-analysis_code.do) are available in the reop. The detailed instructions are given in the readme.txt file. 
 
 For generating some of the tables in Appendix C and E, you can use appendixCE_tables.R which will read the LLM-Results.csv files provided above. 
+
+
+## References
+Humans vs. large language models: Judgmental forecasting in an era of advanced AI, MAhdi Abolghasemi, Odkhishig Ganbold, Kristian Raotaru, 2024, International Journal of Forecasting (to appear). 
