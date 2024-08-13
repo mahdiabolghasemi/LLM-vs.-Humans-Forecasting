@@ -1,0 +1,2089 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Downloads\datasets_codes_part1\data_analysis_part1_log.txt
+  log type:  text
+ opened on:  12 Aug 2024, 14:08:11
+
+. 
+. // Please note: Code chunks that begin with 'preserve' and end with 'restore' should be executed in a single step. Failing to do so will prevent the original dataset from being
+>  restored properly.
+. 
+. ** ============================================================================================
+. ** TITLE: HUMANS VS LARGE LANGUAGE MODELS: JUDGMENTAL FORECASTING IN AN ERA OF ADVANCED AI
+. ** FILE: STATA DATA ANALYSIS CODE
+. ** ANALYSIS FOR: TABLES 2-6, FIGURES 2-6, APPENDICES D, F, J, K
+. ** ============================================================================================
+. 
+. ** ============================= START OF MAIN DATA ANALYSES ====================================
+. 
+. ** READ IN DATA FOR TABLES/FIGURES 2-6, APPENDICES D, F, J:
+. use "experiment_dataset.dta", clear
+
+. 
+. ** === TABLES 2-6 and FIGURES 2-6 - Mixed-effects model results ===
+. // Table 2/Figure 2: Mixed-effects model results for H1 - APE by Forecaster Type: Human vs. LLMs
+. mixed abs_perc_error actual_sales i.forecaster_code || partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11557.709  
+Iteration 1:  Log restricted-likelihood = -11557.418  
+Iteration 2:  Log restricted-likelihood = -11557.418  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,973
+Group variable: partid                               Number of groups =    128
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.2
+                                                                  max =     24
+                                                     Wald chi2(6)     =  77.60
+Log restricted-likelihood = -11557.418               Prob > chi2      = 0.0000
+
+---------------------------------------------------------------------------------
+ abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+   actual_sales |  -.0011313    .000188    -6.02   0.000    -.0014998   -.0007628
+                |
+forecaster_code |
+          Bard  |   4.893831    2.85386     1.71   0.086    -.6996308    10.48729
+          Bing  |   2.727686   2.690628     1.01   0.311    -2.545847    8.001219
+    ChatGPT3.5  |   14.76956   2.795363     5.28   0.000     9.290749    20.24837
+      ChatGPT4  |   .6903527   2.643476     0.26   0.794    -4.490766    5.871471
+        Llama2  |   9.180265   2.917125     3.15   0.002     3.462805    14.89773
+                |
+          _cons |   14.35214   .5423936    26.46   0.000     13.28907    15.41522
+---------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.147905   .9352573      .2324813     5.66792
+-----------------------------+------------------------------------------------
+               var(Residual) |   138.7749   3.682076      131.7426    146.1826
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 1.87          Prob >= chibar2 = 0.0860
+
+. graph box abs_perc_error, over(forecaster_code) ytitle("Absolute Percentage Error")
+
+. // Table 3/Figure 3: Mixed-effects model results for H2 - Interaction: forecasters and statistical forecast type
+. mixed abs_perc_error actual_sales i.frcast_type_code##i.forecaster_code || partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11536.084  
+Iteration 1:  Log restricted-likelihood = -11535.798  
+Iteration 2:  Log restricted-likelihood = -11535.798  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,973
+Group variable: partid                               Number of groups =    128
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.2
+                                                                  max =     24
+                                                     Wald chi2(12)    =  95.09
+Log restricted-likelihood = -11535.798               Prob > chi2      = 0.0000
+
+--------------------------------------------------------------------------------------------------
+                  abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+---------------------------------+----------------------------------------------------------------
+                    actual_sales |  -.0011393   .0001877    -6.07   0.000    -.0015071   -.0007715
+                                 |
+                frcast_type_code |
+                       advanced  |   .8068738   .4550111     1.77   0.076    -.0849317    1.698679
+                                 |
+                 forecaster_code |
+                           Bard  |     10.727   3.572338     3.00   0.003     3.725347    17.72865
+                           Bing  |   .6652182   3.334068     0.20   0.842    -5.869436    7.199872
+                     ChatGPT3.5  |   10.24734   3.446108     2.97   0.003     3.493088    17.00158
+                       ChatGPT4  |   .0471103   3.233805     0.01   0.988     -6.29103    6.385251
+                         Llama2  |   9.787438   3.572338     2.74   0.006     2.785785    16.78909
+                                 |
+frcast_type_code#forecaster_code |
+                  advanced#Bard  |  -14.64284   5.385835    -2.72   0.007    -25.19889   -4.086802
+                  advanced#Bing  |   5.225223   5.043968     1.04   0.300    -4.660773    15.11122
+            advanced#ChatGPT3.5  |   11.84637      5.303     2.23   0.025     1.452678    22.24006
+              advanced#ChatGPT4  |   1.703841   4.978272     0.34   0.732    -8.053393    11.46107
+                advanced#Llama2  |  -1.645235   5.610409    -0.29   0.769    -12.64143    9.350964
+                                 |
+                           _cons |   14.07454   .5649933    24.91   0.000     12.96717     15.1819
+--------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.155459   .9330141      .2373686    5.624524
+-----------------------------+------------------------------------------------
+               var(Residual) |   138.2411    3.67175      131.2287    145.6282
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 1.90          Prob >= chibar2 = 0.0839
+
+. margins i.frcast_type_code##i.forecaster_code
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+
+--------------------------------------------------------------------------------------------------
+                                 |            Delta-method
+                                 |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+---------------------------------+----------------------------------------------------------------
+                frcast_type_code |
+                       baseline  |   11.34137     .28793    39.39   0.000     10.77704     11.9057
+                       advanced  |   12.17708   .3669407    33.19   0.000     11.45789    12.89627
+                                 |
+                 forecaster_code |
+                          Human  |   11.42756   .2400929    47.60   0.000     10.95698    11.89813
+                           Bard  |   16.73183   2.844812     5.88   0.000      11.1561    22.30756
+                           Bing  |   14.02785   2.679021     5.24   0.000     8.777062    19.27863
+                     ChatGPT3.5  |   26.06199   2.782368     9.37   0.000     20.60865    31.51533
+                       ChatGPT4  |   12.10566   2.629837     4.60   0.000      6.95127    17.26004
+                         Llama2  |   20.60571   2.903691     7.10   0.000     14.91458    26.29684
+                                 |
+frcast_type_code#forecaster_code |
+                 baseline#Human  |   11.12875   .2931954    37.96   0.000     10.55409     11.7034
+                  baseline#Bard  |   21.85575   3.560281     6.14   0.000     14.87772    28.83377
+                  baseline#Bing  |   11.79396   3.321164     3.55   0.000     5.284602    18.30332
+            baseline#ChatGPT3.5  |   21.37608   3.433626     6.23   0.000      14.6463    28.10586
+              baseline#ChatGPT4  |   11.17586   3.220488     3.47   0.001     4.863815     17.4879
+                baseline#Llama2  |   20.91618   3.560281     5.87   0.000     13.93816    27.89421
+                 advanced#Human  |   11.93562   .3739759    31.92   0.000     11.20264     12.6686
+                  advanced#Bard  |   8.019774   4.293691     1.87   0.062    -.3957064    16.43525
+                  advanced#Bing  |   17.82606   4.063937     4.39   0.000      9.86089    25.79123
+            advanced#ChatGPT3.5  |   34.02932   4.293691     7.93   0.000     25.61384     42.4448
+              advanced#ChatGPT4  |   13.68657   4.063937     3.37   0.001     5.721401    21.65174
+                advanced#Llama2  |   20.07782   4.572137     4.39   0.000      11.1166    29.03905
+--------------------------------------------------------------------------------------------------
+
+. margins, over( i.frcast_type_code i.forecaster_code )
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+Over:       frcast_type_code forecaster_code
+
+--------------------------------------------------------------------------------------------------
+                                 |            Delta-method
+                                 |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+---------------------------------+----------------------------------------------------------------
+frcast_type_code#forecaster_code |
+                 baseline#Human  |    11.1427   .2931865    38.01   0.000     10.56807    11.71734
+                  baseline#Bard  |   21.81249   3.560274     6.13   0.000     14.83448     28.7905
+                  baseline#Bing  |   11.89997   3.321118     3.58   0.000     5.390696    18.40924
+            baseline#ChatGPT3.5  |   21.49737   3.433568     6.26   0.000      14.7677    28.22704
+              baseline#ChatGPT4  |   11.19767   3.220486     3.48   0.001     4.885634    17.50971
+                baseline#Llama2  |   20.87293   3.560274     5.86   0.000     13.89492    27.85093
+                 advanced#Human  |   11.91032   .3739524    31.85   0.000     11.17738    12.64325
+                  advanced#Bard  |   7.936024   4.293669     1.85   0.065    -.4794135    16.35146
+                  advanced#Bing  |   17.82208   4.063937     4.39   0.000     9.856907    25.78725
+            advanced#ChatGPT3.5  |   33.94557   4.293669     7.91   0.000     25.53013    42.36101
+              advanced#ChatGPT4  |   13.68259   4.063937     3.37   0.001     5.717417    21.64776
+                advanced#Llama2  |   20.17455    4.57211     4.41   0.000     11.21338    29.13572
+--------------------------------------------------------------------------------------------------
+
+. marginsplot, xdim( forecaster_code ) title ("APE: Predictive margins with 95% CIs")
+
+Variables that uniquely identify margins: frcast_type_code forecaster_code
+
+. // Table 4/Figure 4: Mixed-effects model results for H3 - Interaction: forecasters and promotion
+. mixed abs_perc_error actual_sales i.promo_yn_code##i.forecaster_code || partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood =  -11494.97  
+Iteration 1:  Log restricted-likelihood = -11494.779  
+Iteration 2:  Log restricted-likelihood = -11494.779  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,973
+Group variable: partid                               Number of groups =    128
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.2
+                                                                  max =     24
+                                                     Wald chi2(12)    = 179.09
+Log restricted-likelihood = -11494.779               Prob > chi2      = 0.0000
+
+-----------------------------------------------------------------------------------------------
+               abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+------------------------------+----------------------------------------------------------------
+                 actual_sales |  -.0014111   .0001883    -7.49   0.000    -.0017802   -.0010421
+                              |
+                promo_yn_code |
+                   yes promo  |   3.295254   .4805491     6.86   0.000     2.353395    4.237113
+                              |
+              forecaster_code |
+                        Bard  |  -.6950881   4.556981    -0.15   0.879    -9.626607    8.236431
+                        Bing  |   .1976306   4.556981     0.04   0.965    -8.733888     9.12915
+                  ChatGPT3.5  |  -3.099959   4.556981    -0.68   0.496    -12.03148     5.83156
+                    ChatGPT4  |   .5613598   4.556981     0.12   0.902    -8.370159    9.492879
+                      Llama2  |  -2.060768   4.556981    -0.45   0.651    -10.99229    6.870751
+                              |
+promo_yn_code#forecaster_code |
+              yes promo#Bard  |   8.870999   5.452444     1.63   0.104    -1.815596    19.55759
+              yes promo#Bing  |   3.632243   5.271865     0.69   0.491    -6.700423    13.96491
+        yes promo#ChatGPT3.5  |   26.94993   5.384335     5.01   0.000     16.39682    37.50303
+          yes promo#ChatGPT4  |   .1361114   5.224826     0.03   0.979    -10.10436    10.37658
+            yes promo#Llama2  |   18.14867   5.530759     3.28   0.001     7.308581    28.98876
+                              |
+                        _cons |   12.77122   .5900759    21.64   0.000     11.61469    13.92775
+-----------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.419794   .9447775      .3853078      5.2317
+-----------------------------+------------------------------------------------
+               var(Residual) |   134.2504    3.56585      127.4403    141.4245
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 2.95          Prob >= chibar2 = 0.0430
+
+. margins i.promo_yn_code##i.forecaster_code
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+
+-----------------------------------------------------------------------------------------------
+                              |            Delta-method
+                              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+------------------------------+----------------------------------------------------------------
+                promo_yn_code |
+                    no promo  |   9.088885   .4062154    22.37   0.000     8.292717    9.885052
+                   yes promo  |   12.77936   .2765152    46.22   0.000      12.2374    13.32132
+                              |
+              forecaster_code |
+                       Human  |   11.42581   .2416697    47.28   0.000     10.95214    11.89947
+                        Bard  |   16.93117   2.864135     5.91   0.000     11.31757    22.54477
+                        Bing  |   14.16222   2.693914     5.26   0.000     8.882247     19.4422
+                  ChatGPT3.5  |    27.1627    2.80048     9.70   0.000     21.67386    32.65154
+                    ChatGPT4  |    12.0823   2.648764     4.56   0.000     6.890822    17.27379
+                      Llama2  |   22.05018   2.936578     7.51   0.000      16.2946    27.80577
+                              |
+promo_yn_code#forecaster_code |
+              no promo#Human  |   9.122567   .4141063    22.03   0.000     8.310933      9.9342
+               no promo#Bard  |   8.427479   4.538974     1.86   0.063    -.4687478    17.32371
+               no promo#Bing  |   9.320197   4.538974     2.05   0.040     .4239709    18.21642
+         no promo#ChatGPT3.5  |   6.022607   4.538974     1.33   0.185    -2.873619    14.91883
+           no promo#ChatGPT4  |   9.683927   4.538974     2.13   0.033     .7877001    18.58015
+             no promo#Llama2  |   7.061799   4.538974     1.56   0.120    -1.834428    15.95803
+             yes promo#Human  |   12.41782   .2814596    44.12   0.000     11.86617    12.96947
+              yes promo#Bard  |   20.59373   3.427698     6.01   0.000     13.87557    27.31189
+              yes promo#Bing  |   16.24769   3.132187     5.19   0.000     10.10872    22.38667
+        yes promo#ChatGPT3.5  |   36.26779   3.318061    10.93   0.000     29.76451    42.77107
+          yes promo#ChatGPT4  |   13.11529   3.052441     4.30   0.000     7.132617    19.09797
+            yes promo#Llama2  |   28.50572   3.550844     8.03   0.000      21.5462    35.46525
+-----------------------------------------------------------------------------------------------
+
+. margins, over( i.promo_yn_code i.forecaster_code )
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+Over:       promo_yn_code forecaster_code
+
+-----------------------------------------------------------------------------------------------
+                              |            Delta-method
+                              |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+------------------------------+----------------------------------------------------------------
+promo_yn_code#forecaster_code |
+              no promo#Human  |   9.586669   .4094505    23.41   0.000     8.784161    10.38918
+               no promo#Bard  |   8.893215   4.538549     1.96   0.050    -.0021782    17.78861
+               no promo#Bing  |   9.785933   4.538549     2.16   0.031     .8905406    18.68133
+         no promo#ChatGPT3.5  |   6.488343   4.538549     1.43   0.153     -2.40705    15.38374
+           no promo#ChatGPT4  |   10.14966   4.538549     2.24   0.025      1.25427    19.04506
+             no promo#Llama2  |   7.527535   4.538549     1.66   0.097    -1.367858    16.42293
+             yes promo#Human  |   12.21786   .2801884    43.61   0.000      11.6687    12.76702
+              yes promo#Bard  |   20.22966   3.427353     5.90   0.000     13.51217    26.94715
+              yes promo#Bing  |   16.15604   3.132163     5.16   0.000     10.01712    22.29497
+        yes promo#ChatGPT3.5  |   36.11514   3.317998    10.88   0.000     29.61199     42.6183
+          yes promo#ChatGPT4  |   12.94475   3.052356     4.24   0.000     6.962239    18.92726
+            yes promo#Llama2  |   28.25035    3.55068     7.96   0.000     21.29114    35.20956
+-----------------------------------------------------------------------------------------------
+
+. marginsplot, xdim( forecaster_code ) title ("APE: Predictive margins with 95% CIs")
+
+Variables that uniquely identify margins: promo_yn_code forecaster_code
+
+. // Table 5/Figure 5: Mixed-effects model results for H4 - Interaction: Forecasters and external impact
+. mixed abs_perc_error actual_sales i.ext_impact_pn_code##i.forecaster_code || partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11540.698  
+Iteration 1:  Log restricted-likelihood = -11540.409  
+Iteration 2:  Log restricted-likelihood = -11540.409  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,973
+Group variable: partid                               Number of groups =    128
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.2
+                                                                  max =     24
+                                                     Wald chi2(12)    =  85.59
+Log restricted-likelihood = -11540.409               Prob > chi2      = 0.0000
+
+----------------------------------------------------------------------------------------------------
+                    abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-----------------------------------+----------------------------------------------------------------
+                      actual_sales |  -.0011409   .0002154    -5.30   0.000     -.001563   -.0007187
+                                   |
+                ext_impact_pn_code |
+                         positive  |  -.0898201   .5048636    -0.18   0.859    -1.079335    .8996944
+                                   |
+                   forecaster_code |
+                             Bard  |   4.933762   3.578478     1.38   0.168    -2.079925    11.94745
+                             Bing  |   .6540537   3.578478     0.18   0.855    -6.359634    7.667741
+                       ChatGPT3.5  |   14.52347   3.578478     4.06   0.000     7.509785    21.53716
+                         ChatGPT4  |  -3.157787   3.452023    -0.91   0.360    -9.923628    3.608055
+                           Llama2  |   13.86114   3.722436     3.72   0.000     6.565296    21.15698
+                                   |
+ext_impact_pn_code#forecaster_code |
+                    positive#Bard  |   -.109557    5.39329    -0.02   0.984    -10.68021     10.4611
+                    positive#Bing  |   4.340179   4.935541     0.88   0.379    -5.333303    14.01366
+              positive#ChatGPT3.5  |   .5690937   5.211646     0.11   0.913    -9.645546    10.78373
+                positive#ChatGPT4  |   8.397563   4.844641     1.73   0.083    -1.097759    17.89289
+                  positive#Llama2  |  -11.12318    5.48989    -2.03   0.043    -21.88317   -.3631909
+                                   |
+                             _cons |    14.4173    .735535    19.60   0.000     12.97567    15.85892
+----------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.151659   .9351039      .2345203    5.655455
+-----------------------------+------------------------------------------------
+               var(Residual) |   138.6796   3.683412      131.6449    146.0902
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 1.88          Prob >= chibar2 = 0.0852
+
+. margins i.ext_impact_pn_code##i.forecaster_code
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+
+----------------------------------------------------------------------------------------------------
+                                   |            Delta-method
+                                   |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-----------------------------------+----------------------------------------------------------------
+                ext_impact_pn_code |
+                         negative  |   11.67136   .3247476    35.94   0.000     11.03486    12.30785
+                         positive  |    11.6151    .362048    32.08   0.000      10.9055     12.3247
+                                   |
+                   forecaster_code |
+                            Human  |   11.42716    .240347    47.54   0.000     10.95608    11.89823
+                             Bard  |    16.3118   2.855387     5.71   0.000     10.71534    21.90825
+                             Bing  |   14.02721   2.683807     5.23   0.000     8.767043    19.28738
+                       ChatGPT3.5  |   26.20579   2.786789     9.40   0.000     20.74379     31.6678
+                         ChatGPT4  |   12.03457   2.632924     4.57   0.000     6.874137    17.19501
+                           Llama2  |   20.30101   2.910839     6.97   0.000     14.59587    26.00615
+                                   |
+ext_impact_pn_code#forecaster_code |
+                   negative#Human  |   11.46743    .330293    34.72   0.000     10.82007    12.11479
+                    negative#Bard  |   16.40119   3.566304     4.60   0.000     9.411363    23.39102
+                    negative#Bing  |   12.12148   3.566304     3.40   0.001     5.131654    19.11131
+              negative#ChatGPT3.5  |    25.9909   3.566304     7.29   0.000     19.00107    32.98073
+                negative#ChatGPT4  |   8.309641   3.439689     2.42   0.016     1.567974    15.05131
+                  negative#Llama2  |   25.32856   3.710323     6.83   0.000     18.05646    32.60066
+                   positive#Human  |   11.37761   .3677265    30.94   0.000     10.65688    12.09834
+                    positive#Bard  |   16.20181   4.301382     3.77   0.000     7.771259    24.63237
+                    positive#Bing  |   16.37184   3.711763     4.41   0.000      9.09692    23.64676
+              positive#ChatGPT3.5  |   26.47017   4.072369     6.50   0.000     18.48848    34.45187
+                positive#ChatGPT4  |   16.61738   3.711763     4.48   0.000     9.342464    23.89231
+                  positive#Llama2  |   14.11557   4.301382     3.28   0.001     5.685012    22.54612
+----------------------------------------------------------------------------------------------------
+
+. margins, over( i.ext_impact_pn_code i.forecaster_code )
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+Over:       ext_impact_pn_code forecaster_code
+
+----------------------------------------------------------------------------------------------------
+                                   |            Delta-method
+                                   |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-----------------------------------+----------------------------------------------------------------
+ext_impact_pn_code#forecaster_code |
+                   negative#Human  |   10.88836   .3116775    34.93   0.000     10.27748    11.49924
+                    negative#Bard  |   15.86549   3.564869     4.45   0.000     8.878473     22.8525
+                    negative#Bing  |   11.58578   3.564869     3.25   0.001     4.598764     18.5728
+              negative#ChatGPT3.5  |    25.4552   3.564869     7.14   0.000     18.46818    32.44221
+                negative#ChatGPT4  |   7.726037   3.437924     2.25   0.025     .9878302    14.46424
+                  negative#Llama2  |    24.8668   3.709299     6.70   0.000      17.5967    32.13689
+                   positive#Human  |    12.0878   .3424105    35.30   0.000     11.41669    12.75891
+                    positive#Bard  |   16.85652   4.299606     3.92   0.000     8.429449    25.28359
+                    positive#Bing  |   17.08808   3.709299     4.61   0.000     9.817987    24.35817
+              positive#ChatGPT3.5  |   27.28533    4.06946     6.70   0.000     19.30934    35.26133
+                positive#ChatGPT4  |   17.33362   3.709299     4.67   0.000     10.06353    24.60371
+                  positive#Llama2  |   14.77027   4.299606     3.44   0.001     6.343202    23.19735
+----------------------------------------------------------------------------------------------------
+
+. marginsplot, xdim( forecaster_code ) title ("APE: Predictive margins with 95% CIs")
+
+Variables that uniquely identify margins: ext_impact_pn_code forecaster_code
+
+. // Table 6/Figure 6: Mixed-effects model results for H5 -  Interaction: forecasters and treatment conditions
+. mixed abs_perc_error actual_sales i.treatment_code##i.forecaster_code || partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11353.067  
+Iteration 1:  Log restricted-likelihood =  -11352.96  
+Iteration 2:  Log restricted-likelihood =  -11352.96  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,973
+Group variable: partid                               Number of groups =    128
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.2
+                                                                  max =     24
+                                                     Wald chi2(36)    = 348.84
+Log restricted-likelihood =  -11352.96               Prob > chi2      = 0.0000
+
+-------------------------------------------------------------------------------------------------------------------------
+                                         abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+--------------------------------------------------------+----------------------------------------------------------------
+                                           actual_sales |  -.0010126   .0002244    -4.51   0.000    -.0014525   -.0005728
+                                                        |
+                                         treatment_code |
+           Yes-promo_Positive-impact_Advanced-forecast  |   4.697986    .783573     6.00   0.000     3.162211    6.233761
+           Yes-promo_Negative-impact_Baseline-forecast  |    4.53842   .7452467     6.09   0.000     3.077763    5.999077
+           Yes-promo_Negative-impact_Advanced-forecast  |  -1.053787   .7175456    -1.47   0.142    -2.460151    .3525761
+            No-promo_Positive-impact_Baseline-forecast  |  -2.543187   .8141851    -3.12   0.002    -4.138961   -.9474139
+            No-promo_Negative-impact_Baseline-forecast  |  -.3624041   .7312219    -0.50   0.620    -1.795573    1.070764
+                                                        |
+                                        forecaster_code |
+                                                  Bard  |   28.48033   8.125989     3.50   0.000     12.55369    44.40698
+                                                  Bing  |   7.441054   5.832101     1.28   0.202    -3.989654    18.87176
+                                            ChatGPT3.5  |    33.2227   6.684026     4.97   0.000     20.12225    46.32315
+                                              ChatGPT4  |   6.817417   5.832101     1.17   0.242     -4.61329    18.24812
+                                                Llama2  |   28.48033   8.125989     3.50   0.000     12.55369    44.40698
+                                                        |
+                         treatment_code#forecaster_code |
+      Yes-promo_Positive-impact_Advanced-forecast#Bard  |  -36.26658   10.35487    -3.50   0.000    -56.56175   -15.97141
+      Yes-promo_Positive-impact_Advanced-forecast#Bing  |  -2.915505   8.033308    -0.36   0.717     -18.6605    12.82949
+Yes-promo_Positive-impact_Advanced-forecast#ChatGPT3.5  |  -14.14281   9.265991    -1.53   0.127    -32.30382    4.018201
+  Yes-promo_Positive-impact_Advanced-forecast#ChatGPT4  |  -.9317441   8.033308    -0.12   0.908    -16.67674    14.81325
+    Yes-promo_Positive-impact_Advanced-forecast#Llama2  |   -37.4793   10.35487    -3.62   0.000    -57.77447   -17.18412
+      Yes-promo_Negative-impact_Baseline-forecast#Bard  |  -2.159661    10.3542    -0.21   0.835    -22.45353    18.13421
+      Yes-promo_Negative-impact_Baseline-forecast#Bing  |  -13.48284    8.67059    -1.56   0.120    -30.47688    3.511206
+Yes-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |  -13.75944   9.265059    -1.49   0.138    -31.91862    4.399745
+  Yes-promo_Negative-impact_Baseline-forecast#ChatGPT4  |  -14.53583    8.03221    -1.81   0.070    -30.27868    1.207008
+    Yes-promo_Negative-impact_Baseline-forecast#Llama2  |  -2.731323    10.3542    -0.26   0.792    -23.02519    17.56254
+      Yes-promo_Negative-impact_Advanced-forecast#Bard  |  -29.64012   9.490984    -3.12   0.002    -48.24211   -11.03813
+      Yes-promo_Negative-impact_Advanced-forecast#Bing  |  -.6736606   7.619751    -0.09   0.930     -15.6081    14.26078
+Yes-promo_Negative-impact_Advanced-forecast#ChatGPT3.5  |    -8.8869   8.289959    -1.07   0.284    -25.13492    7.361121
+  Yes-promo_Negative-impact_Advanced-forecast#ChatGPT4  |  -8.589204   7.619751    -1.13   0.260    -23.52364    6.345234
+    Yes-promo_Negative-impact_Advanced-forecast#Llama2  |  -7.511875   9.822634    -0.76   0.444    -26.76388    11.74013
+       No-promo_Positive-impact_Baseline-forecast#Bard  |  -26.57343   10.35742    -2.57   0.010    -46.87361   -6.273254
+       No-promo_Positive-impact_Baseline-forecast#Bing  |  -5.482801   8.675134    -0.63   0.527    -22.48575    11.52015
+ No-promo_Positive-impact_Baseline-forecast#ChatGPT3.5  |  -39.65077   9.269344    -4.28   0.000    -57.81835   -21.48319
+   No-promo_Positive-impact_Baseline-forecast#ChatGPT4  |   -4.94082   8.675134    -0.57   0.569    -21.94377    12.06213
+     No-promo_Positive-impact_Baseline-forecast#Llama2  |  -30.92404   10.35742    -2.99   0.003    -51.22422   -10.62386
+       No-promo_Negative-impact_Baseline-forecast#Bard  |  -31.12852   9.824858    -3.17   0.002    -50.38489   -11.87215
+       No-promo_Negative-impact_Baseline-forecast#Bing  |  -8.565499   8.031767    -1.07   0.286    -24.30747    7.176475
+ No-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |  -33.82819   8.670183    -3.90   0.000    -50.82144   -16.83495
+   No-promo_Negative-impact_Baseline-forecast#ChatGPT4  |  -7.244095   8.031767    -0.90   0.367    -22.98607    8.497879
+     No-promo_Negative-impact_Baseline-forecast#Llama2  |  -30.25551   9.824858    -3.08   0.002    -49.51187   -10.99914
+                                                        |
+                                                  _cons |   13.17027   .7914332    16.64   0.000     11.61908    14.72145
+-------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.738073   .9496694      .5956324     5.07175
+-----------------------------+------------------------------------------------
+               var(Residual) |     127.95   3.412943      121.4326    134.8172
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 4.67          Prob >= chibar2 = 0.0154
+
+. margins i.treatment_code##i.forecaster_code
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+
+-------------------------------------------------------------------------------------------------------------------------
+                                                        |            Delta-method
+                                                        |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+--------------------------------------------------------+----------------------------------------------------------------
+                                         treatment_code |
+           Yes-promo_Positive-impact_Baseline-forecast  |   11.27292   .5286424    21.32   0.000      10.2368    12.30904
+           Yes-promo_Positive-impact_Advanced-forecast  |   15.35743   .5857688    26.22   0.000     14.20935    16.50552
+           Yes-promo_Negative-impact_Baseline-forecast  |   15.46052   .5359511    28.85   0.000     14.41007    16.51096
+           Yes-promo_Negative-impact_Advanced-forecast  |   9.834408   .4976116    19.76   0.000     8.859107    10.80971
+            No-promo_Positive-impact_Baseline-forecast  |   7.990959   .6235694    12.81   0.000     6.768786    9.213133
+            No-promo_Negative-impact_Baseline-forecast  |   10.14406   .5145007    19.72   0.000     9.135655    11.15246
+                                                        |
+                                        forecaster_code |
+                                                 Human  |   11.42669   .2424804    47.12   0.000     10.95143    11.90194
+                                                  Bard  |   18.75012   2.911421     6.44   0.000     13.04384     24.4564
+                                                  Bing  |   13.84612   2.714735     5.10   0.000     8.525333     19.1669
+                                            ChatGPT3.5  |   27.31236   2.813058     9.71   0.000     21.79887    32.82585
+                                              ChatGPT4  |   11.96491   2.659955     4.50   0.000     6.751491    17.17832
+                                                Llama2  |   22.77952   2.961093     7.69   0.000     16.97588    28.58315
+                                                        |
+                         treatment_code#forecaster_code |
+     Yes-promo_Positive-impact_Baseline-forecast#Human  |   10.55204   .5363762    19.67   0.000     9.500764    11.60332
+      Yes-promo_Positive-impact_Baseline-forecast#Bard  |   39.03238   8.108305     4.81   0.000     23.14039    54.92436
+      Yes-promo_Positive-impact_Baseline-forecast#Bing  |    17.9931    5.80738     3.10   0.002     6.610839    29.37535
+Yes-promo_Positive-impact_Baseline-forecast#ChatGPT3.5  |   43.77475   6.662465     6.57   0.000     30.71656    56.83294
+  Yes-promo_Positive-impact_Baseline-forecast#ChatGPT4  |   17.36946    5.80738     2.99   0.003     5.987203    28.75172
+    Yes-promo_Positive-impact_Baseline-forecast#Llama2  |   39.03238   8.108305     4.81   0.000     23.14039    54.92436
+     Yes-promo_Positive-impact_Advanced-forecast#Human  |   15.25003   .5948748    25.64   0.000      14.0841    16.41596
+      Yes-promo_Positive-impact_Advanced-forecast#Bard  |   7.463781   6.667399     1.12   0.263     -5.60408    20.53164
+      Yes-promo_Positive-impact_Advanced-forecast#Bing  |   19.77558   5.811695     3.40   0.001     8.384866    31.16629
+Yes-promo_Positive-impact_Advanced-forecast#ChatGPT3.5  |   34.32992   6.667399     5.15   0.000     21.26206    47.39779
+  Yes-promo_Positive-impact_Advanced-forecast#ChatGPT4  |    21.1357   5.811695     3.64   0.000      9.74499    32.52641
+    Yes-promo_Positive-impact_Advanced-forecast#Llama2  |   6.251064   6.667399     0.94   0.348    -6.816797    19.31893
+     Yes-promo_Negative-impact_Baseline-forecast#Human  |   15.09046   .5445097    27.71   0.000     14.02324    16.15768
+      Yes-promo_Negative-impact_Baseline-forecast#Bard  |   41.41113   6.663025     6.22   0.000     28.35185    54.47042
+      Yes-promo_Negative-impact_Baseline-forecast#Bing  |   9.048678   6.663025     1.36   0.174    -4.010611    22.10797
+Yes-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |   34.55373   6.663025     5.19   0.000     21.49444    47.61302
+  Yes-promo_Negative-impact_Baseline-forecast#ChatGPT4  |   7.372046   5.808682     1.27   0.204    -4.012762    18.75685
+    Yes-promo_Negative-impact_Baseline-forecast#Llama2  |   40.83947   6.663025     6.13   0.000     27.78018    53.89876
+     Yes-promo_Negative-impact_Advanced-forecast#Human  |   9.498255   .5060327    18.77   0.000     8.506449    10.49006
+      Yes-promo_Negative-impact_Advanced-forecast#Bard  |   8.338469   5.230748     1.59   0.111    -1.913608    18.59055
+      Yes-promo_Negative-impact_Advanced-forecast#Bing  |   16.26565   5.230748     3.11   0.002     6.013571    26.51773
+Yes-promo_Negative-impact_Advanced-forecast#ChatGPT3.5  |   33.83406   5.230748     6.47   0.000     23.58198    44.08614
+  Yes-promo_Negative-impact_Advanced-forecast#ChatGPT4  |   7.726468   5.230748     1.48   0.140    -2.525609    17.97855
+    Yes-promo_Negative-impact_Advanced-forecast#Llama2  |   30.46671   5.809563     5.24   0.000     19.08018    41.85325
+      No-promo_Positive-impact_Baseline-forecast#Human  |   8.008855   .6346354    12.62   0.000     6.764992    9.252717
+       No-promo_Positive-impact_Baseline-forecast#Bard  |   9.915755    6.66558     1.49   0.137    -3.148542    22.98005
+       No-promo_Positive-impact_Baseline-forecast#Bing  |   9.967108    6.66558     1.50   0.135    -3.097189     23.0314
+ No-promo_Positive-impact_Baseline-forecast#ChatGPT3.5  |    1.58079    6.66558     0.24   0.813    -11.48351    14.64509
+   No-promo_Positive-impact_Baseline-forecast#ChatGPT4  |   9.885452    6.66558     1.48   0.138    -3.178844    22.94975
+     No-promo_Positive-impact_Baseline-forecast#Llama2  |   5.565147    6.66558     0.83   0.404     -7.49915    18.62944
+      No-promo_Negative-impact_Baseline-forecast#Human  |   10.18964   .5247178    19.42   0.000      9.16121    11.21807
+       No-promo_Negative-impact_Baseline-forecast#Bard  |    7.54145   5.807421     1.30   0.194    -3.840886    18.92379
+       No-promo_Negative-impact_Baseline-forecast#Bing  |   9.065193   5.807421     1.56   0.119    -2.317143    20.44753
+ No-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |   9.584149   5.807421     1.65   0.099    -1.798188    20.96649
+   No-promo_Negative-impact_Baseline-forecast#ChatGPT4  |   9.762961   5.807421     1.68   0.093    -1.619376     21.1453
+     No-promo_Negative-impact_Baseline-forecast#Llama2  |   8.414466   5.807421     1.45   0.147     -2.96787     19.7968
+-------------------------------------------------------------------------------------------------------------------------
+
+. margins, over( i.treatment_code i.forecaster_code )
+
+Predictive margins                                       Number of obs = 2,973
+
+Expression: Linear prediction, fixed portion, predict()
+Over:       treatment_code forecaster_code
+
+-------------------------------------------------------------------------------------------------------------------------
+                                                        |            Delta-method
+                                                        |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+--------------------------------------------------------+----------------------------------------------------------------
+                         treatment_code#forecaster_code |
+     Yes-promo_Positive-impact_Baseline-forecast#Human  |   10.54477   .5363735    19.66   0.000     9.493501    11.59605
+      Yes-promo_Positive-impact_Baseline-forecast#Bard  |   38.23101    8.10636     4.72   0.000     22.34284    54.11918
+      Yes-promo_Positive-impact_Baseline-forecast#Bing  |   18.03751   5.807372     3.11   0.002     6.655274    29.41975
+Yes-promo_Positive-impact_Baseline-forecast#ChatGPT3.5  |   43.86144   6.662437     6.58   0.000      30.8033    56.91958
+  Yes-promo_Positive-impact_Baseline-forecast#ChatGPT4  |   17.41388   5.807372     3.00   0.003     6.031637    28.79612
+    Yes-promo_Positive-impact_Baseline-forecast#Llama2  |   38.23101    8.10636     4.72   0.000     22.34284    54.11918
+     Yes-promo_Positive-impact_Advanced-forecast#Human  |    16.3041   .5470662    29.80   0.000     15.23187    17.37633
+      Yes-promo_Positive-impact_Advanced-forecast#Bard  |   8.624181   6.662437     1.29   0.196    -4.433956    21.68232
+      Yes-promo_Positive-impact_Advanced-forecast#Bing  |   20.78679   5.807372     3.58   0.000     9.404546    32.16903
+Yes-promo_Positive-impact_Advanced-forecast#ChatGPT3.5  |   35.49032   6.662437     5.33   0.000     22.43219    48.54846
+  Yes-promo_Positive-impact_Advanced-forecast#ChatGPT4  |   22.14691   5.807372     3.81   0.000     10.76467    33.52915
+    Yes-promo_Positive-impact_Advanced-forecast#Llama2  |   7.411464   6.662437     1.11   0.266    -5.646673     20.4696
+     Yes-promo_Negative-impact_Baseline-forecast#Human  |   14.54527   .5309364    27.40   0.000     13.50465    15.58588
+      Yes-promo_Negative-impact_Baseline-forecast#Bard  |   41.01178   6.662437     6.16   0.000     27.95364    54.06991
+      Yes-promo_Negative-impact_Baseline-forecast#Bing  |   8.649319   6.662437     1.30   0.194    -4.408818    21.70746
+Yes-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |   34.15437   6.662437     5.13   0.000     21.09623    47.21251
+  Yes-promo_Negative-impact_Baseline-forecast#ChatGPT4  |   6.815478   5.807372     1.17   0.241    -4.566762    18.19772
+    Yes-promo_Negative-impact_Baseline-forecast#Llama2  |   40.44011   6.662437     6.07   0.000     27.38198    53.49825
+     Yes-promo_Negative-impact_Advanced-forecast#Human  |   8.684641   .4728165    18.37   0.000     7.757938    9.611345
+      Yes-promo_Negative-impact_Advanced-forecast#Bard  |   7.523129   5.227626     1.44   0.150    -2.722829    17.76909
+      Yes-promo_Negative-impact_Advanced-forecast#Bing  |   15.45031   5.227626     2.96   0.003      5.20435    25.69627
+Yes-promo_Negative-impact_Advanced-forecast#ChatGPT3.5  |   33.01872   5.227626     6.32   0.000     22.77276    43.26468
+  Yes-promo_Negative-impact_Advanced-forecast#ChatGPT4  |   6.911128   5.227626     1.32   0.186     -3.33483    17.15709
+    Yes-promo_Negative-impact_Advanced-forecast#Llama2  |   29.74686   5.807372     5.12   0.000     18.36462     41.1291
+      No-promo_Positive-impact_Baseline-forecast#Human  |   8.932304   .6007317    14.87   0.000     7.754891    10.10972
+       No-promo_Positive-impact_Baseline-forecast#Bard  |    10.8392   6.662437     1.63   0.104    -2.218934    23.89734
+       No-promo_Positive-impact_Baseline-forecast#Bing  |   10.89056   6.662437     1.63   0.102     -2.16758    23.94869
+ No-promo_Positive-impact_Baseline-forecast#ChatGPT3.5  |   2.504239   6.662437     0.38   0.707     -10.5539    15.56238
+   No-promo_Positive-impact_Baseline-forecast#ChatGPT4  |    10.8089   6.662437     1.62   0.105    -2.249236    23.86704
+     No-promo_Positive-impact_Baseline-forecast#Llama2  |   6.488596   6.662437     0.97   0.330    -6.569541    19.54673
+      No-promo_Negative-impact_Baseline-forecast#Human  |   10.07896   .5241438    19.23   0.000     9.051655    11.10626
+       No-promo_Negative-impact_Baseline-forecast#Bard  |   7.433723   5.807372     1.28   0.201    -3.948517    18.81596
+       No-promo_Negative-impact_Baseline-forecast#Bing  |   8.957466   5.807372     1.54   0.123    -2.424774    20.33971
+ No-promo_Negative-impact_Baseline-forecast#ChatGPT3.5  |   9.476422   5.807372     1.63   0.103    -1.905819    20.85866
+   No-promo_Negative-impact_Baseline-forecast#ChatGPT4  |   9.655234   5.807372     1.66   0.096    -1.727007    21.03747
+     No-promo_Negative-impact_Baseline-forecast#Llama2  |   8.306739   5.807372     1.43   0.153    -3.075501    19.68898
+-------------------------------------------------------------------------------------------------------------------------
+
+. marginsplot, xdim( forecaster_code ) title ("APE: Predictive margins with 95% CIs")
+
+Variables that uniquely identify margins: treatment_code forecaster_code
+
+. 
+. ** === APPENDIX D: descriptive stats ===
+. // APPENDIX D: MdAPE - OVERALL (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/2,973
+
+            Tabulation: Freq.   Numeric  Label
+                        2,866         1  Human
+                           20         2  Bard
+                           23         3  Bing
+                           21         4  ChatGPT3.5
+                           24         5  ChatGPT4
+                           19         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.39     2.55     3.75     6.52     8.07     9.54    15.96
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    10.46        .    10.46    10.46    10.46    10.46    10.46
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     7.66        .     7.66     7.66     7.66     7.66     7.66
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    25.08        .    25.08    25.08    25.08    25.08    25.08
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     9.63        .     9.63     9.63     9.63     9.63     9.63
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    13.54        .    13.54    13.54    13.54    13.54    13.54
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - BASELINE FORECAST (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if frcast_type_ab == "baseline"
+(1,101 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/1,872
+
+            Tabulation: Freq.   Numeric  Label
+                        1,806         1  Human
+                           12         2  Bard
+                           14         3  Bing
+                           13         4  ChatGPT3.5
+                           15         5  ChatGPT4
+                           12         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.67     3.37     3.23     6.27     7.47    10.01    20.35
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    17.49        .    17.49    17.49    17.49    17.49    17.49
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     8.46        .     8.46     8.46     8.46     8.46     8.46
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    18.19        .    18.19    18.19    18.19    18.19    18.19
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     8.95        .     8.95     8.95     8.95     8.95     8.95
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    15.24        .    15.24    15.24    15.24    15.24    15.24
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - ADVANCED FORECAST (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if frcast_type_ab == "advanced"
+(1,872 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/1,101
+
+            Tabulation: Freq.   Numeric  Label
+                        1,060         1  Human
+                            8         2  Bard
+                            9         3  Bing
+                            8         4  ChatGPT3.5
+                            9         5  ChatGPT4
+                            7         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     7.86     3.32     1.67     5.53     7.60     9.42    19.43
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     3.89        .     3.89     3.89     3.89     3.89     3.89
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     7.66        .     7.66     7.66     7.66     7.66     7.66
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    31.88        .    31.88    31.88    31.88    31.88    31.88
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    10.30        .    10.30    10.30    10.30    10.30    10.30
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     5.30        .     5.30     5.30     5.30     5.30     5.30
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - YES PROMO (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if promo_yn == "yes promo"
+(895 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/2,078
+
+            Tabulation: Freq.   Numeric  Label
+                        2,006         1  Human
+                           13         2  Bard
+                           16         3  Bing
+                           14         4  ChatGPT3.5
+                           17         5  ChatGPT4
+                           12         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.75     3.29     3.28     6.23     7.96    10.22    20.23
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    19.82        .    19.82    19.82    19.82    19.82    19.82
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    10.25        .    10.25    10.25    10.25    10.25    10.25
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    35.76        .    35.76    35.76    35.76    35.76    35.76
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    10.30        .    10.30    10.30    10.30    10.30    10.30
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    23.28        .    23.28    23.28    23.28    23.28    23.28
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - NO PROMO (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if promo_yn == "no promo"
+(2,078 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/895
+
+            Tabulation: Freq.   Numeric  Label
+                          860         1  Human
+                            7         2  Bard
+                            7         3  Bing
+                            7         4  ChatGPT3.5
+                            7         5  ChatGPT4
+                            7         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.01     3.27     2.10     5.46     7.14     9.96    18.25
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     7.38        .     7.38     7.38     7.38     7.38     7.38
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     5.68        .     5.68     5.68     5.68     5.68     5.68
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     4.54        .     4.54     4.54     4.54     4.54     4.54
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     5.20        .     5.20     5.20     5.20     5.20     5.20
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     4.99        .     4.99     4.99     4.99     4.99     4.99
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - POSITIVE EXTERNAL IMPACT (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if ext_impact_pn == "positive"
+(1,640 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/1,333
+
+            Tabulation: Freq.   Numeric  Label
+                        1,286         1  Human
+                            8         2  Bard
+                           11         3  Bing
+                            9         4  ChatGPT3.5
+                           11         5  ChatGPT4
+                            8         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.46     3.42     3.67     6.25     7.44     9.96    20.98
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    15.79        .    15.79    15.79    15.79    15.79    15.79
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    12.84        .    12.84    12.84    12.84    12.84    12.84
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    25.08        .    25.08    25.08    25.08    25.08    25.08
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    14.48        .    14.48    14.48    14.48    14.48    14.48
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     9.27        .     9.27     9.27     9.27     9.27     9.27
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX D: MdAPE - NEGATIVE EXTERNAL IMPACT (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if ext_impact_pn == "negative"
+(1,333 observations deleted)
+
+. bysort partid: egen median_abs_perc_error = median(abs_perc_error)
+
+. codebook forecaster_code
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+forecaster_code                                                                                                                                                            partid0
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (long)
+                 Label: partid0_code
+
+                 Range: [1,6]                         Units: 1
+         Unique values: 6                         Missing .: 0/1,640
+
+            Tabulation: Freq.   Numeric  Label
+                        1,580         1  Human
+                           12         2  Bard
+                           12         3  Bing
+                           12         4  ChatGPT3.5
+                           13         5  ChatGPT4
+                           11         6  Llama2
+
+. collapse (first) forecaster_code (median) median_abs_perc_error, by(partid)
+
+. bysort forecaster_code: egen median_of_median_abs_perc_error = median(median_abs_perc_error)
+
+. label define forecaster_code_lbl 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3.5" 5 "ChatGPT4" 6 "Llama2"
+
+. label values forecaster_code forecaster_code_lbl
+
+. univar median_abs_perc_error, by(forecaster_code)
+
+-> forecaster_code=Human 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error     123     8.78     3.08     2.80     6.12     8.13    10.81    18.98
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bard 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     6.34        .     6.34     6.34     6.34     6.34     6.34
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Bing 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     7.36        .     7.36     7.36     7.36     7.36     7.36
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT3.5 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    25.03        .    25.03    25.03    25.03    25.03    25.03
+-------------------------------------------------------------------------------
+
+-> forecaster_code=ChatGPT4 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1     4.65        .     4.65     4.65     4.65     4.65     4.65
+-------------------------------------------------------------------------------
+
+-> forecaster_code=Llama2 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+median_abs_perc_error       1    16.93        .    16.93    16.93    16.93    16.93    16.93
+-------------------------------------------------------------------------------
+
+. restore
+
+. 
+. ** === APPENDIX F: Forecast accuracy of Expert's in terms of APE (n=1, based on one expert data) ===
+. // APPENDIX F: Expert APE - overall (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape      24     6.12     5.02     0.03     2.08     5.64     8.19    19.68
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - baseline (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if frcast_type_ab == "baseline"
+(1,101 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape      15     5.57     5.14     0.03     2.07     3.17     8.17    19.68
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - advanced (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if frcast_type_ab == "advanced"
+(1,872 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape       9     7.05     4.96     0.28     4.40     6.78     8.22    16.77
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - Yes promotion (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if promo_yn == "yes promo"
+(895 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape      17     6.84     5.43     0.28     2.10     6.78     8.22    19.68
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - No promotion (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if promo_yn == "no promo"
+(2,078 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape       7     4.39     3.57     0.03     2.07     3.17     8.17     9.91
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - Positive external impact (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if ext_impact_pn == "positive"
+(1,640 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape      11     4.63     3.83     0.03     1.87     2.11     8.14    11.50
+-------------------------------------------------------------------------------
+
+. restore
+
+. // APPENDIX F: Expert APE - Negative external impact (Note: executed below (preserve-restore) in a single step)
+. preserve
+
+. keep if ext_impact_pn == "negative"
+(1,333 observations deleted)
+
+. collapse (first) expert_ape, by(period_id)
+
+. univar expert_ape
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+expert_ape      13     7.38     5.68     0.28     3.17     6.03     9.91    19.68
+-------------------------------------------------------------------------------
+
+. restore
+
+. 
+. ** === APPENDIX J: Mixed-effects model for human forecasters and regression model for each LLM by hypothesiss ===
+. // APPENDIX J: H2a - APE baseline to advanced change significance test by forecaster: 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3" 5 "ChatGPT4" 6 "Llama2"
+. mixed abs_perc_error actual_sales i.frcast_type_code if forecaster == "Human"|| partid:
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log likelihood = -11090.178  
+Iteration 1:  Log likelihood = -11089.988  
+Iteration 2:  Log likelihood = -11089.988  
+
+Computing standard errors ...
+
+Mixed-effects ML regression                          Number of obs    =  2,866
+Group variable: partid                               Number of groups =    123
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.3
+                                                                  max =     24
+                                                     Wald chi2(2)     =  40.67
+Log likelihood = -11089.988                          Prob > chi2      = 0.0000
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |   -.001153   .0001877    -6.14   0.000    -.0015209   -.0007851
+                 |
+frcast_type_code |
+       advanced  |   .8063245   .4467291     1.80   0.071    -.0692484    1.681897
+           _cons |    14.1111    .563807    25.03   0.000     13.00606    15.21614
+----------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |    1.31714   .9219834      .3340414    5.193541
+-----------------------------+------------------------------------------------
+               var(Residual) |   133.2503   3.600013       126.378    140.4964
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 2.62          Prob >= chibar2 = 0.0527
+
+. regress abs_perc_error actual_sales i.frcast_type_code if forecaster == "Bard"
+
+      Source |       SS           df       MS      Number of obs   =        20
+-------------+----------------------------------   F(2, 17)        =      1.68
+       Model |  931.274728         2  465.637364   Prob > F        =    0.2161
+    Residual |  4714.91518        17  277.347952   R-squared       =    0.1649
+-------------+----------------------------------   Adj R-squared   =    0.0667
+       Total |  5646.18991        19   297.16789   Root MSE        =    16.654
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |    .000513    .003228     0.16   0.876    -.0062975    .0073235
+                 |
+frcast_type_code |
+       advanced  |   -13.8947   7.602236    -1.83   0.085    -29.93401    2.144618
+           _cons |   20.46659   9.738351     2.10   0.051    -.0795395    41.01271
+----------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.frcast_type_code if forecaster == "Bing"
+
+      Source |       SS           df       MS      Number of obs   =        23
+-------------+----------------------------------   F(2, 20)        =      0.46
+       Model |  207.911064         2  103.955532   Prob > F        =    0.6373
+    Residual |   4512.5524        20   225.62762   R-squared       =    0.0440
+-------------+----------------------------------   Adj R-squared   =   -0.0516
+       Total |  4720.46346        22  214.566521   Root MSE        =    15.021
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |  -.0007222   .0027308    -0.26   0.794    -.0064185    .0049741
+                 |
+frcast_type_code |
+       advanced  |   5.991829   6.423044     0.93   0.362    -7.406406    19.39006
+           _cons |    13.7001   7.902327     1.73   0.098    -2.783868    30.18406
+----------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.frcast_type_code if forecaster == "ChatGPT3.5"
+
+      Source |       SS           df       MS      Number of obs   =        21
+-------------+----------------------------------   F(2, 18)        =      1.18
+       Model |  769.921733         2  384.960867   Prob > F        =    0.3309
+    Residual |  5888.43228        18  327.135127   R-squared       =    0.1156
+-------------+----------------------------------   Adj R-squared   =    0.0174
+       Total |  6658.35402        20  332.917701   Root MSE        =    18.087
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |    -.00029   .0033093    -0.09   0.931    -.0072426    .0066626
+                 |
+frcast_type_code |
+       advanced  |   12.50039   8.149285     1.53   0.142     -4.62062    29.62141
+           _cons |   22.21636   9.616402     2.31   0.033     2.013045    42.41967
+----------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.frcast_type_code if forecaster == "ChatGPT4"
+
+      Source |       SS           df       MS      Number of obs   =        24
+-------------+----------------------------------   F(2, 21)        =      1.65
+       Model |  514.997599         2  257.498799   Prob > F        =    0.2165
+    Residual |  3282.27813        21  156.298958   R-squared       =    0.1356
+-------------+----------------------------------   Adj R-squared   =    0.0533
+       Total |  3797.27573        23  165.098945   Root MSE        =    12.502
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |  -.0039107    .002231    -1.75   0.094    -.0085502    .0007288
+                 |
+frcast_type_code |
+       advanced  |   2.573471    5.27153     0.49   0.630    -8.389277    13.53622
+           _cons |    21.2343   6.572911     3.23   0.004     7.565185    34.90342
+----------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.frcast_type_code if forecaster == "Llama2"
+
+      Source |       SS           df       MS      Number of obs   =        19
+-------------+----------------------------------   F(2, 16)        =      0.03
+       Model |  31.9395797         2  15.9697898   Prob > F        =    0.9684
+    Residual |  7946.14613        16  496.634133   R-squared       =    0.0040
+-------------+----------------------------------   Adj R-squared   =   -0.1205
+       Total |  7978.08571        18  443.226984   Root MSE        =    22.285
+
+----------------------------------------------------------------------------------
+  abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    actual_sales |   .0010869   .0044383     0.24   0.810    -.0083219    .0104957
+                 |
+frcast_type_code |
+       advanced  |  -.5648306   10.61279    -0.05   0.958    -23.06294    21.93328
+           _cons |   18.02137   13.30324     1.35   0.194    -10.18023    46.22297
+----------------------------------------------------------------------------------
+
+. // APPENDIX J: H3a - APE NON-PROMO to PROMO change significance test by forecaster: 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3" 5 "ChatGPT4" 6 "Llama2"
+. mixed abs_perc_error actual_sales i.promo_yn_code if forecaster == "Human"|| partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11076.015  
+Iteration 1:  Log restricted-likelihood = -11075.885  
+Iteration 2:  Log restricted-likelihood = -11075.884  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,866
+Group variable: partid                               Number of groups =    123
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.3
+                                                                  max =     24
+                                                     Wald chi2(2)     =  85.91
+Log restricted-likelihood = -11075.884               Prob > chi2      = 0.0000
+
+--------------------------------------------------------------------------------
+abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+---------------+----------------------------------------------------------------
+  actual_sales |  -.0013947   .0001896    -7.36   0.000    -.0017663   -.0010231
+               |
+ promo_yn_code |
+    yes promo  |   3.288412   .4752612     6.92   0.000     2.356918    4.219907
+         _cons |   12.73428   .5900782    21.58   0.000     11.57775    13.89081
+--------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.557129   .9449379      .4739973    5.115323
+-----------------------------+------------------------------------------------
+               var(Residual) |   131.1403   3.544371      124.3743    138.2745
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 3.65          Prob >= chibar2 = 0.0281
+
+. regress abs_perc_error actual_sales i.promo_yn_code if forecaster == "Bard"
+
+      Source |       SS           df       MS      Number of obs   =        20
+-------------+----------------------------------   F(2, 17)        =      1.01
+       Model |  599.222182         2  299.611091   Prob > F        =    0.3853
+    Residual |  5046.96773        17  296.880455   R-squared       =    0.1061
+-------------+----------------------------------   Adj R-squared   =    0.0010
+       Total |  5646.18991        19   297.16789   Root MSE        =     17.23
+
+-------------------------------------------------------------------------------
+abs_perc_er~r | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+ actual_sales |  -.0007603   .0034426    -0.22   0.828    -.0080236    .0065031
+              |
+promo_yn_code |
+   yes promo  |   11.78352   8.327469     1.42   0.175    -5.785903    29.35295
+        _cons |   10.60809   10.13452     1.05   0.310    -10.77389    31.99006
+-------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.promo_yn_code if forecaster == "Bing"
+
+      Source |       SS           df       MS      Number of obs   =        23
+-------------+----------------------------------   F(2, 20)        =      0.51
+       Model |  230.062858         2  115.031429   Prob > F        =    0.6067
+    Residual |   4490.4006        20   224.52003   R-squared       =    0.0487
+-------------+----------------------------------   Adj R-squared   =   -0.0464
+       Total |  4720.46346        22  214.566521   Root MSE        =    14.984
+
+-------------------------------------------------------------------------------
+abs_perc_er~r | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+ actual_sales |  -.0010482   .0027565    -0.38   0.708    -.0067982    .0047019
+              |
+promo_yn_code |
+   yes promo  |   6.784134   6.876939     0.99   0.336     -7.56091    21.12918
+        _cons |   12.15019   8.410259     1.44   0.164    -5.393299    29.69368
+-------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.promo_yn_code if forecaster == "ChatGPT3.5"
+
+      Source |       SS           df       MS      Number of obs   =        21
+-------------+----------------------------------   F(2, 18)        =     15.50
+       Model |  4212.23292         2  2106.11646   Prob > F        =    0.0001
+    Residual |   2446.1211        18  135.895617   R-squared       =    0.6326
+-------------+----------------------------------   Adj R-squared   =    0.5918
+       Total |  6658.35402        20  332.917701   Root MSE        =    11.657
+
+-------------------------------------------------------------------------------
+abs_perc_er~r | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+ actual_sales |   -.001996   .0021597    -0.92   0.368    -.0065334    .0025413
+              |
+promo_yn_code |
+   yes promo  |   30.50149   5.478703     5.57   0.000     18.99116    42.01182
+        _cons |   10.99054   6.568397     1.67   0.112    -2.809147    24.79023
+-------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.promo_yn_code if forecaster == "ChatGPT4"
+
+      Source |       SS           df       MS      Number of obs   =        24
+-------------+----------------------------------   F(2, 21)        =      1.91
+       Model |  583.974667         2  291.987334   Prob > F        =    0.1732
+    Residual |  3213.30106        21  153.014336   R-squared       =    0.1538
+-------------+----------------------------------   Adj R-squared   =    0.0732
+       Total |  3797.27573        23  165.098945   Root MSE        =     12.37
+
+-------------------------------------------------------------------------------
+abs_perc_er~r | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+ actual_sales |  -.0042352   .0022436    -1.89   0.073    -.0089009    .0004306
+              |
+promo_yn_code |
+   yes promo  |   4.704714   5.646542     0.83   0.414    -7.037912    16.44734
+        _cons |   19.70236   6.889741     2.86   0.009      5.37436    34.03036
+-------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.promo_yn_code if forecaster == "Llama2"
+
+      Source |       SS           df       MS      Number of obs   =        19
+-------------+----------------------------------   F(2, 16)        =      2.52
+       Model |  1913.57579         2  956.787894   Prob > F        =    0.1115
+    Residual |  6064.50993        16   379.03187   R-squared       =    0.2399
+-------------+----------------------------------   Adj R-squared   =    0.1448
+       Total |  7978.08571        18  443.226984   Root MSE        =    19.469
+
+-------------------------------------------------------------------------------
+abs_perc_er~r | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+ actual_sales |  -.0007891   .0039638    -0.20   0.845     -.009192    .0076139
+              |
+promo_yn_code |
+   yes promo  |   21.12605   9.478202     2.23   0.041     1.033155    41.21894
+        _cons |   9.307364   11.57945     0.80   0.433    -15.23997     33.8547
+-------------------------------------------------------------------------------
+
+. // APPENDIX J: H4a - APE NEGATIVE to POSITIVE EXT.IMPACT change significance test by forecaster: 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3" 5 "ChatGPT4" 6 "Llama2"
+. mixed abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "Human"|| partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11099.708  
+Iteration 1:  Log restricted-likelihood = -11099.531  
+Iteration 2:  Log restricted-likelihood = -11099.531  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,866
+Group variable: partid                               Number of groups =    123
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.3
+                                                                  max =     24
+                                                     Wald chi2(2)     =  37.42
+Log restricted-likelihood = -11099.531               Prob > chi2      = 0.0000
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |  -.0011753   .0002154    -5.46   0.000    -.0015974   -.0007531
+                   |
+ext_impact_pn_code |
+         positive  |  -.1280182   .4975692    -0.26   0.797    -1.103236    .8471996
+             _cons |   14.52458   .7345996    19.77   0.000      13.0848    15.96437
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.381655   .9352461      .3666223    5.206913
+-----------------------------+------------------------------------------------
+               var(Residual) |   133.4883   3.607737      126.6013      140.75
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 2.83          Prob >= chibar2 = 0.0462
+
+. regress abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "Bard"
+
+      Source |       SS           df       MS      Number of obs   =        20
+-------------+----------------------------------   F(2, 17)        =      0.03
+       Model |  17.0563335         2  8.52816673   Prob > F        =    0.9746
+    Residual |  5629.13358        17  331.125504   R-squared       =    0.0030
+-------------+----------------------------------   Adj R-squared   =   -0.1143
+       Total |  5646.18991        19   297.16789   Root MSE        =    18.197
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |   .0007595   .0039339     0.19   0.849    -.0075403    .0090592
+                   |
+ext_impact_pn_code |
+         positive  |   1.783489   9.264597     0.19   0.850     -17.7631    21.33008
+             _cons |   13.54515   13.11645     1.03   0.316    -14.12814    41.21844
+------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "Bing"
+
+      Source |       SS           df       MS      Number of obs   =        23
+-------------+----------------------------------   F(2, 20)        =      0.41
+       Model |  184.604477         2  92.3022385   Prob > F        =    0.6710
+    Residual |  4535.85898        20  226.792949   R-squared       =    0.0391
+-------------+----------------------------------   Adj R-squared   =   -0.0570
+       Total |  4720.46346        22  214.566521   Root MSE        =     15.06
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |    .000681   .0031134     0.22   0.829    -.0058135    .0071755
+                   |
+ext_impact_pn_code |
+         positive  |   6.249597   7.154679     0.87   0.393    -8.674801      21.174
+             _cons |   9.505202   10.45837     0.91   0.374    -12.31058    31.32098
+------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "ChatGPT3.5"
+
+      Source |       SS           df       MS      Number of obs   =        21
+-------------+----------------------------------   F(2, 18)        =      0.03
+       Model |  25.3022175         2  12.6511088   Prob > F        =    0.9663
+    Residual |   6633.0518        18  368.502878   R-squared       =    0.0038
+-------------+----------------------------------   Adj R-squared   =   -0.1069
+       Total |  6658.35402        20  332.917701   Root MSE        =    19.196
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |   .0005949   .0040184     0.15   0.884    -.0078474    .0090372
+                   |
+ext_impact_pn_code |
+         positive  |    2.53454   9.710401     0.26   0.797    -17.86626    22.93534
+             _cons |   23.63765   13.46959     1.75   0.096    -4.660895     51.9362
+------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "ChatGPT4"
+
+      Source |       SS           df       MS      Number of obs   =        24
+-------------+----------------------------------   F(2, 21)        =      2.33
+       Model |  688.545248         2  344.272624   Prob > F        =    0.1224
+    Residual |  3108.73048        21  148.034785   R-squared       =    0.1813
+-------------+----------------------------------   Adj R-squared   =    0.1034
+       Total |  3797.27573        23  165.098945   Root MSE        =    12.167
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |  -.0024194   .0025007    -0.97   0.344    -.0076199    .0027812
+                   |
+ext_impact_pn_code |
+         positive  |   6.851132    5.74132     1.19   0.246    -5.088597    18.79086
+             _cons |   15.21914   8.448341     1.80   0.086    -2.350146    32.78843
+------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.ext_impact_pn_code if forecaster == "Llama2"
+
+      Source |       SS           df       MS      Number of obs   =        19
+-------------+----------------------------------   F(2, 16)        =      0.52
+       Model |  487.654368         2  243.827184   Prob > F        =    0.6038
+    Residual |  7490.43135        16  468.151959   R-squared       =    0.0611
+-------------+----------------------------------   Adj R-squared   =   -0.0562
+       Total |  7978.08571        18  443.226984   Root MSE        =    21.637
+
+------------------------------------------------------------------------------------
+    abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------------+----------------------------------------------------------------
+      actual_sales |  -.0008627   .0047393    -0.18   0.858    -.0109096    .0091842
+                   |
+ext_impact_pn_code |
+         positive  |  -10.94078   11.07199    -0.99   0.338    -34.41236     12.5308
+             _cons |   27.44661   15.60173     1.76   0.098    -5.627572    60.52079
+------------------------------------------------------------------------------------
+
+. // APPENDIX J: H5a - APE TREATMENT CONDITIONS change significance test by forecaster: 1 "Human" 2 "Bard" 3 "Bing" 4 "ChatGPT3" 5 "ChatGPT4" 6 "Llama2"
+. mixed abs_perc_error actual_sales i.treatment_code if forecaster == "Human"|| partid:, reml
+
+Performing EM optimization ...
+
+Performing gradient-based optimization: 
+Iteration 0:  Log restricted-likelihood = -11017.955  
+Iteration 1:  Log restricted-likelihood = -11017.878  
+Iteration 2:  Log restricted-likelihood = -11017.878  
+
+Computing standard errors ...
+
+Mixed-effects REML regression                        Number of obs    =  2,866
+Group variable: partid                               Number of groups =    123
+                                                     Obs per group:
+                                                                  min =     19
+                                                                  avg =   23.3
+                                                                  max =     24
+                                                     Wald chi2(6)     = 203.11
+Log restricted-likelihood = -11017.878               Prob > chi2      = 0.0000
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |   -.000933   .0002268    -4.11   0.000    -.0013776   -.0004884
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |   4.780674   .7790778     6.14   0.000      3.25371    6.307638
+Yes-promo_Negative-impact_Baseline-forecast  |   4.495875   .7400812     6.07   0.000     3.045342    5.946407
+Yes-promo_Negative-impact_Advanced-forecast  |  -1.118486    .713053    -1.57   0.117    -2.516044    .2790723
+ No-promo_Positive-impact_Baseline-forecast  |  -2.471229   .8091228    -3.05   0.002     -4.05708   -.8853772
+ No-promo_Negative-impact_Baseline-forecast  |  -.3716525   .7258259    -0.51   0.609    -1.794245     1.05094
+                                             |
+                                       _cons |     12.965    .793955    16.33   0.000     11.40888    14.52112
+--------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects parameters  |   Estimate   Std. err.     [95% conf. interval]
+-----------------------------+------------------------------------------------
+partid: Identity             |
+                  var(_cons) |   1.819519   .9495742      .6542292    5.060382
+-----------------------------+------------------------------------------------
+               var(Residual) |   126.0621   3.409585      119.5534     132.925
+------------------------------------------------------------------------------
+LR test vs. linear model: chibar2(01) = 5.21          Prob >= chibar2 = 0.0112
+
+. regress abs_perc_error actual_sales i.treatment_code if forecaster == "Bard"
+
+      Source |       SS           df       MS      Number of obs   =        20
+-------------+----------------------------------   F(6, 13)        =      5.08
+       Model |  3957.72578         6  659.620963   Prob > F        =    0.0069
+    Residual |  1688.46413        13  129.881856   R-squared       =    0.7010
+-------------+----------------------------------   Adj R-squared   =    0.5629
+       Total |  5646.18991        19   297.16789   Root MSE        =    11.397
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |  -.0036046   .0029196    -1.23   0.239    -.0099121    .0027029
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |  -36.59018   11.84182    -3.09   0.009    -62.17289   -11.00748
+Yes-promo_Negative-impact_Baseline-forecast  |   1.349731   10.46797     0.13   0.899    -21.26494     23.9644
+Yes-promo_Negative-impact_Advanced-forecast  |  -30.65814   9.535141    -3.22   0.007    -51.25756   -10.05872
+ No-promo_Positive-impact_Baseline-forecast  |  -33.53168   11.53112    -2.91   0.012    -58.44316   -8.620203
+ No-promo_Negative-impact_Baseline-forecast  |  -33.26645   10.07031    -3.30   0.006    -55.02204   -11.51086
+                                             |
+                                       _cons |   50.40382   12.73393     3.96   0.002     22.89383    77.91381
+--------------------------------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.treatment_code if forecaster == "Bing"
+
+      Source |       SS           df       MS      Number of obs   =        23
+-------------+----------------------------------   F(6, 16)        =      0.30
+       Model |   475.91578         6  79.3192966   Prob > F        =    0.9284
+    Residual |  4244.54768        16   265.28423   R-squared       =    0.1008
+-------------+----------------------------------   Adj R-squared   =   -0.2364
+       Total |  4720.46346        22  214.566521   Root MSE        =    16.288
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |   .0001467     .00363     0.04   0.968    -.0075485    .0078419
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |   2.889319   12.02719     0.24   0.813    -22.60718    28.38582
+Yes-promo_Negative-impact_Baseline-forecast  |  -9.452479   12.54113    -0.75   0.462    -36.03848    17.13352
+Yes-promo_Negative-impact_Advanced-forecast  |  -2.711748   11.35239    -0.24   0.814    -26.77774    21.35425
+ No-promo_Positive-impact_Baseline-forecast  |  -7.019623   12.83272    -0.55   0.592    -34.22377    20.18453
+ No-promo_Negative-impact_Baseline-forecast  |  -9.102087   11.52994    -0.79   0.441    -33.54447     15.3403
+                                             |
+                                       _cons |   17.66468   12.30646     1.44   0.170    -8.423851    43.75321
+--------------------------------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.treatment_code if forecaster == "ChatGPT3.5"
+
+      Source |       SS           df       MS      Number of obs   =        21
+-------------+----------------------------------   F(6, 14)        =      5.13
+       Model |  4576.42599         6  762.737664   Prob > F        =    0.0056
+    Residual |  2081.92803        14  148.709145   R-squared       =    0.6873
+-------------+----------------------------------   Adj R-squared   =    0.5533
+       Total |  6658.35402        20  332.917701   Root MSE        =    12.195
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |  -.0028058    .002737    -1.03   0.323     -.008676    .0030645
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |  -11.34618    10.3712    -1.09   0.292    -33.59019    10.89782
+Yes-promo_Negative-impact_Baseline-forecast  |  -8.360296   10.04318    -0.83   0.419    -29.90077    13.18017
+Yes-promo_Negative-impact_Advanced-forecast  |  -8.343331   9.233413    -0.90   0.381    -28.14703    11.46037
+ No-promo_Positive-impact_Baseline-forecast  |  -43.67571   10.21051    -4.28   0.001    -65.57508   -21.77634
+ No-promo_Negative-impact_Baseline-forecast  |  -33.84631    9.32862    -3.63   0.003    -53.85421   -13.83841
+                                             |
+                                       _cons |    50.8759   9.817794     5.18   0.000     29.81882    71.93297
+--------------------------------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.treatment_code if forecaster == "ChatGPT4"
+
+      Source |       SS           df       MS      Number of obs   =        24
+-------------+----------------------------------   F(6, 17)        =      0.91
+       Model |   921.38686         6  153.564477   Prob > F        =    0.5124
+    Residual |  2875.88887        17  169.169933   R-squared       =    0.2426
+-------------+----------------------------------   Adj R-squared   =   -0.0247
+       Total |  3797.27573        23  165.098945   Root MSE        =    13.007
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |  -.0025178   .0028781    -0.87   0.394    -.0085901    .0035545
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |   2.329164   9.598746     0.24   0.811    -17.92242    22.58075
+Yes-promo_Negative-impact_Baseline-forecast  |  -9.104085   9.354295    -0.97   0.344    -28.83992    10.63175
+Yes-promo_Negative-impact_Advanced-forecast  |  -8.365012   9.060798    -0.92   0.369    -27.48162     10.7516
+ No-promo_Positive-impact_Baseline-forecast  |  -8.790636   10.24328    -0.86   0.403    -30.40207     12.8208
+ No-promo_Negative-impact_Baseline-forecast  |  -7.380344    9.20717    -0.80   0.434    -26.80577    12.04509
+                                             |
+                                       _cons |   23.81349   9.788214     2.43   0.026     3.162168    44.46482
+--------------------------------------------------------------------------------------------------------------
+
+. regress abs_perc_error actual_sales i.treatment_code if forecaster == "Llama2"
+
+      Source |       SS           df       MS      Number of obs   =        19
+-------------+----------------------------------   F(6, 12)        =      3.28
+       Model |  4954.49296         6  825.748827   Prob > F        =    0.0380
+    Residual |  3023.59275        12  251.966062   R-squared       =    0.6210
+-------------+----------------------------------   Adj R-squared   =    0.4315
+       Total |  7978.08571        18  443.226984   Root MSE        =    15.873
+
+--------------------------------------------------------------------------------------------------------------
+                              abs_perc_error | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+---------------------------------------------+----------------------------------------------------------------
+                                actual_sales |  -.0085216   .0040905    -2.08   0.059     -.017434    .0003908
+                                             |
+                              treatment_code |
+Yes-promo_Positive-impact_Advanced-forecast  |  -47.32873    16.5158    -2.87   0.014    -83.31357   -11.34389
+Yes-promo_Negative-impact_Baseline-forecast  |  -1.173972   14.58111    -0.08   0.937    -32.94349    30.59554
+Yes-promo_Negative-impact_Advanced-forecast  |  -9.170136   13.75074    -0.67   0.517    -39.13043    20.79016
+ No-promo_Positive-impact_Baseline-forecast  |  -46.25754   16.07848    -2.88   0.014    -81.28953   -11.22556
+ No-promo_Negative-impact_Baseline-forecast  |  -35.76157   14.02946    -2.55   0.026    -66.32913   -5.194007
+                                             |
+                                       _cons |   67.00846   17.79883     3.76   0.003     28.22814    105.7888
+--------------------------------------------------------------------------------------------------------------
+
+. 
+. 
+. ** === APPENDIX K: Mean, Median, and Standard Deviation of Responses to the Post-Experimental Questionnaire
+. ** READ IN DATA FOR APPENDIX K:
+. use "post-experimental-questionnaire_dataset.dta", clear
+
+. 
+. // Q1-The importance of the following information in supporting your judgement when presented with Baseline statistical forecast (1 - Not important, 7 - Very important):
+. // Forthcoming promotion type
+. univar Importance_PromoType_Base
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PromoType_Base     123     5.50     1.52     1.00     4.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Forthcoming external impact
+. univar Importance_EnvImpact_Base
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_EnvImpact_Base     123     5.18     1.63     1.00     4.00     6.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // The uplift size of previous promotions in general 
+. univar Importance_PrevPromoUplift_Base
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PrevPromoUplift_Base     123     5.33     1.36     1.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // The uplift size of previous similar promotions
+.  univar Importance_PrevSimPromoUplift_Ba 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PrevSimPromoUplift_Ba     123     5.50     1.38     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Time series (sales) history
+. univar Importance_SalesHist_Base 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_SalesHist_Base     123     5.50     1.41     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Baseline statistical forecast
+. univar Importance_BaseStatForecast 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_BaseStatForecast     123     5.30     1.41     1.00     4.00     6.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // Frequency of promotions
+. univar Importance_PromoFreq_Base 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PromoFreq_Base     123     5.11     1.44     1.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. 
+. //Q2- The importance of the following information in supporting your judgement when presented with Advanced statistical forecast (1 – Not important, 7 – Very important):
+. // Forthcoming promotion type
+. univar Importance_PromoType_Adv 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PromoType_Adv     123     5.68     1.26     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Forthcoming environmental impact
+. univar Importance_EnvImpact_Adv 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_EnvImpact_Adv     123     5.46     1.41     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // The uplift size of previous promotions in general
+. univar Importance_PrevPromoUplift_Adv 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PrevPromoUplift_Adv     123     5.41     1.23     1.00     5.00     6.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // The uplift size of previous similar promotions
+. univar Importance_PrevSimPromoUplift_Ad 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PrevSimPromoUplift_Ad     123     5.59     1.25     1.00     5.00     6.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // Time series (sales) history
+. univar Importance_SalesHist_Adv 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_SalesHist_Adv     123     5.58     1.43     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Advanced statistical forecast
+. univar Importance_AdvStatForecast 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_AdvStatForecast     123     5.82     1.17     1.00     5.00     6.00     7.00     7.00
+-------------------------------------------------------------------------------
+
+. // Frequency of promotions
+. univar Importance_PromoFreq_Adv 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Importance_PromoFreq_Adv     123     5.20     1.39     1.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. 
+. // Q3- To what extent do you agree with the following statements (1 - Strongly disagree, 7 - Strongly agree):
+. // The earlier promotions had a greater impact on your judgment about the forecast in period 25
+. univar Impact_EarlyPromos 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Impact_EarlyPromos     123     5.02     1.45     1.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // The later promotions had a greater impact on your judgment about the forecast in period 25
+. univar Impact_LatePromos 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Impact_LatePromos     123     5.23     1.23     2.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // All the promotions had an approximately the same impact on your judgment about the forecast in period 25
+. univar Impact_AllPromos 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Impact_AllPromos     123     4.91     1.40     1.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // In my forecasts, I considered only those periods of the provided sales time series that reflected similar conditions to the forecast period (for example, upward or downward 
+> trend)
+. univar Forecast_ConsiderSimilarPeriods 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Forecast_ConsiderSimilarPeriods     123     4.98     1.35     2.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. // In my forecasts, I considered all periods of the provided sales time series regardless of their similarity to the conditions of the forecast period
+. univar Forecast_ConsiderAllPeriods 
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+Forecast_ConsiderAllPeriods     123     5.10     1.33     2.00     4.00     5.00     6.00     7.00
+-------------------------------------------------------------------------------
+
+. //In anticipation of the objective feedback on your performance, how would you assess the accuracy of your judgemental forecasts made during the experiment? (1 - Very low, 7 - 
+> Very high)
+. univar SelfAssess_Accuracy
+                                        -------------- Quantiles --------------
+Variable       n     Mean     S.D.      Min      .25      Mdn      .75      Max
+-------------------------------------------------------------------------------
+SelfAssess_Accuracy_Arr0     123     4.44     1.13     1.00     4.00     4.00     5.00     7.00
+-------------------------------------------------------------------------------
+
+. 
+. //================================ END OF DATA ANALYSES==============================================
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\Downloads\datasets_codes_part1\data_analysis_part1_log.txt
+  log type:  text
+ closed on:  12 Aug 2024, 14:08:40
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
