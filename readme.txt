@@ -1,24 +1,27 @@
 Reproducibility Package for paper "HUMANS VS LARGE LANGUAGE MODELS: JUDGMENTAL FORECASTING IN AN ERA OF ADVANCED AI"
 
-Contents: TABLES 2-6, FIGURES 2-6, APPENDICES D, F, J, K (see datasets_codes_part1.zip) for the paper
-NOTE: The results for Appendix C and E tables are generated using the appendixCE_tables.R file accompanied. 
+Contents: TABLES 2-6, FIGURES 2-6, APPENDICES D, F, J, K (see datasets_codes_part1.zip) for the paper. 
+Also, the tables in Appendix C and E are generated using the appendixCE.R file accompanied. 
 
 Reproducibility Package Assembly Date: 12 August 2024
 
-Author(s) of the Reproducibility Package and Contact Information: Odkhishig Ganbold (odkhishig.ganbold@unimelb.edu.au), Mahdi Abolghasemi (mahdi.abolghasemi@qut.edu.au)
-
+Author(s) of the Reproducibility Package and Contact Information: Odkhishig Ganbold (odkhishig.ganbold@unimelb.edu.au)
 
 The Structure of the Repository Provided:
 1. data-analysis_code.do - STATA code for producing TABLES 2-6, FIGURES 2-6, APPENDICES D, F, J, K
 2. experiment_dataset.dta - STATA data file for data-analysis_code.do input, used for producing TABLES 2-6, FIGURES 2-6, APPENDICES D, F, J
 3. post-experimental-questionnaire_dataset.dta - STATA data file for data-analysis_code.do input, used for producing APPENDIX K
 4. data_analysis_part1_log.txt - STATA code output file containing results for TABLES 2-6, APPENDICES D, F, J, K
+5. appendixCE.R- The R code used for generating the tables in Appendix C, E.
+6. df.rds is the data used for generating Appendix C. This data is read through appendixCE.R file.
+7. experiment_dataset.csv is the data used for generating Appendix E table. This data is called in appendixCE.R.  
 
 
 The Computing Environment, Language(s), Licence(s), and Package(s) Necessary to Run the Reproducibility Check:
 - Computing Environment: Operating System: Windows 11 Pro OS, Version 23H2; Hardware: 12th Gen Intel(R) Core(TM) i7-12700H CPU @ 2.30GHz, 32GB RAM
 - Primary Language: Stata is the primary language used for the analysis.
 - Stata License: Stata/SE 18.0 (licensed version)
+- R version 4.4.1 used for the Appendix C and E.
 
 
 Data Used and Its Format, Access to the Data, Origin, Pre-processing:
@@ -26,12 +29,16 @@ Data Used and Its Format, Access to the Data, Origin, Pre-processing:
 - The datasets underwent pre-processing, including outlier removal and data cleaning, to prepare them for analysis.
 - The pre-processed datasets are saved in STATA .dta format.
 - Access to the data is provided via https://urldefense.com/v3/__https://github.com/mahdiabolghasemi/LLM-vs.-Humans-Forecasting__;!!NVzLfOphnbDXSw!FWhuAInYW0Bl_4QHXga9erPj_FTD5LVqYYMp6dxLz01_-k-Cy3slW8AwpKdgCj57IqMCIMk7GLYF6MoABh1BxRkI7k4$ , with details on the origin of the datasets documented within the repository.
+- df.rds is the data used for generating Appendix C. This data is read through appendixCE.R file. The code conducts all necessary pre-processing for generating the final tables.
+- experiment_dataset.csv is the data used for generating Appendix E table. This data is called in appendixCE.R.  The code conducts all necessary pre-processing for generating the final tables.
+
 
 
 Code to Run for Producing Specific Tables and Figures:
 - A data-analysis_code.do file has been provided, which contains all the necessary code to produce the specific tables and figures presented in the paper.
 - The data-analysis_code.do file includes clear instructions and annotations, detailing the sequence of commands required to replicate each table and figure.
 - Users should execute the data-analysis_code.do file in STATA to generate the results as presented.
+- To generate the tables in Appendix C and E, please run the appendixCE.R code.
 
 
 Type of Computer Used for Running the Experiment and Expected Runtime:
@@ -51,4 +58,5 @@ Availability of Sharable Datasets:
 - All relevant datasets used in the analysis are directly included in the replication kit.
 - Each dataset is provided in STATA .dta format, and corresponding documentation is included to explain the dataset contents and structure.
 - No external datasets or repositories are required for replication; everything necessary is contained within the provided kit.
-
+- df.rds is the data used to generate Appendix C. This data is read through appendixCE.R file.
+- experiment_dataset.csv is the data used for generating Appendix E table. This data is called in appendixCE.R.  
